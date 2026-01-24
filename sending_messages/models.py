@@ -78,20 +78,22 @@ class Mailing(models.Model):
         # if self.start_time < now:
         #     raise ValidationError('Дата начала не может быть в прошлом')
 
-        if self.start_time > self.end_time:
+        if self.start_time >= self.end_time:
             raise ValidationError('Дата окончания должна быть позже даты начала')
 
     def update_status(self):
         now = timezone.now()
+        previous_status = self.status
 
         if now < self.start_time:
             self.status = self.STATUS_CREATED
-
         elif self.start_time <= now <= self.end_time:
             self.status = self.STATUS_RUNNING
-
         else:
             self.status = self.STATUS_FINISHED
+
+        if self.status != previous_status:
+            self.save(update_fields=['status'])
 
     def save(self, *args, **kwargs):
         self.full_clean()

@@ -1,0 +1,6 @@
+{% for recipient in recipients %}
+    <!--suppress ALL -->
+<div class="col">
+    <a href="{% url 'sending_messages:recipient_detail' recipient.pk %}">{{ recipient.email }}</a>
+</div>
+{% endfor %}

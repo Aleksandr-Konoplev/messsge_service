@@ -18,6 +18,6 @@ class MessageAdmin(admin.ModelAdmin):
 
 @admin.register(Mailing)
 class MailingAdmin(admin.ModelAdmin):
-    list_display = ('status', 'id')
+    list_display = ('id', 'status',)
     list_filter = ('message__theme_message',)
     search_fields = ('message__theme_message',)
