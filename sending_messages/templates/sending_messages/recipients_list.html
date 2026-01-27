@@ -1,6 +1,13 @@
+{% extends 'sending_messages/base.html' %}
+{% block content %}
+
+<!--suppress ALL -->
+<a href="{% url 'sending_messages:recipient_create' %}" class="btn btn-primary">Добавить получателя</a>
 {% for recipient in recipients %}
     <!--suppress ALL -->
 <div class="col">
     <a href="{% url 'sending_messages:recipient_detail' recipient.pk %}">{{ recipient.email }}</a>
 </div>
 {% endfor %}
+
+{% endblock %}

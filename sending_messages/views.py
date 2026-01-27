@@ -3,37 +3,79 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
-from sending_messages.models import RecipientMessage
-from sending_messages.forms import RecipientMessageForm
+from sending_messages.models import Recipient, Mailing, Message
+from sending_messages.forms import RecipientForm, MailingForm, MessageForm
+from sending_messages.mixins import MenuActiveMixin
 
 
 def index(request):
     return render(request, 'sending_messages/base.html')
 
 
-# Просмотр получателей рассылки
-class RecipientsMessageListView(ListView):
-    model = RecipientMessage
+# Получатели рассылки
+class RecipientsListView(MenuActiveMixin, ListView):
+    model = Recipient
     template_name = 'sending_messages/recipients_list.html'
     context_object_name = 'recipients'
 
 
-class RecipientMessageDetailView(DetailView):
-    model = RecipientMessage
-    template_name = 'sending_messages/recipients_detail.html'
+class RecipientDetailView(MenuActiveMixin, DetailView):
+    model = Recipient
+    template_name = 'sending_messages/recipient_detail.html'
     context_object_name = 'recipient'
 
 
-class RecipientMessageCreateView(CreateView):
-    model = RecipientMessage
-    form_class = RecipientMessageForm
+class RecipientCreateView(MenuActiveMixin, CreateView):
+    model = Recipient
+    form_class = RecipientForm
     template_name = 'sending_messages/form_recipient.html'
-    success_url = reverse_lazy('sending_messages:recipient_list')
+    success_url = reverse_lazy('sending_messages:recipients_list')
 
 
-class RecipientMessageUpdateView(UpdateView):
-    pass
+class RecipientUpdateView(MenuActiveMixin, UpdateView):
+    model = Recipient
+    form_class = RecipientForm
+    template_name = 'sending_messages/form_recipient.html'
+    success_url = reverse_lazy('sending_messages:recipients_list')
 
 
-class RecipientMessageDeleteView(DeleteView):
-    pass
+class RecipientDeleteView(MenuActiveMixin, DeleteView):
+    model = Recipient
+    template_name = 'sending_messages/recipient_confirm_delete.html'
+    success_url = reverse_lazy('sending_messages:recipients_list')
+
+
+# Рассылки
+class MailingsListView(MenuActiveMixin, ListView):
+    model = Mailing
+    template_name = 'sending_messages/mailings_list.html'
+    context_object_name = 'mailings'
+
+
+class MailingDetailView(MenuActiveMixin, DetailView):
+    model = Mailing
+    template_name = 'sending_messages/mailing_detail.html'
+    context_object_name = 'mailing'
+
+
+class MailingCreateView(MenuActiveMixin, CreateView):
+    model = Mailing
+    form_class = MailingForm
+    template_name = 'sending_messages/form_mailing.html'
+    success_url = reverse_lazy('sending_messages:mailings_list')
+
+
+class MailingUpdateView(MenuActiveMixin, UpdateView):
+    model = Mailing
+    form_class = MailingForm
+    template_name = 'sending_messages/form_mailing.html'
+    success_url = reverse_lazy('sending_messages:mailings_list')
+
+
+class MailingDeleteView(MenuActiveMixin, DeleteView):
+    model = Mailing
+    template_name = 'sending_messages/mailing_confirm_delete.html'
+    success_url = reverse_lazy('sending_messages:mailings_list')
+
+
+# Сообщения

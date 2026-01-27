@@ -1,9 +1,9 @@
 from django.contrib import admin
-from sending_messages.models import RecipientMessage, Message, Mailing
+from sending_messages.models import Recipient, Message, Mailing
 
 
-@admin.register(RecipientMessage)
-class RecipientMessageAdmin(admin.ModelAdmin):
+@admin.register(Recipient)
+class RecipientAdmin(admin.ModelAdmin):
     list_display = ('email', 'full_name',)
     list_filter = ('email',)
     search_fields = ('email',)

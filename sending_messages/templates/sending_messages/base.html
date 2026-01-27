@@ -1,2 +1,25 @@
+<!--&lt;!&ndash;suppress ALL &ndash;&gt;-->
+<!--<a href="{% url 'sending_messages:recipients_list' %}">Список получателей рассылки</a>-->
+<!--<a href="{% url 'sending_messages:recipient_create' %}">Добавить получателя рассылки</a>-->
+{% load static %}
+<!DOCTYPE html>
 <!--suppress ALL -->
-<a href="{% url 'sending_messages:recipients_list' %}">Список получателей рассылки</a>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Сервис рассылок{% endblock %}</title>
+
+    <!-- Bootstrap -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+</head>
+<body>
+
+{% include 'sending_messages/includes/inc_menu.html' %}
+
+<div class="container" style="padding-top: 80px;">
+    {% block content %}{% endblock %}
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

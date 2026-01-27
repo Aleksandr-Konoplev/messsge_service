@@ -1,13 +1,25 @@
 from django.urls import path
 
 from sending_messages.apps import SendingMessagesConfig
-from sending_messages.views import index, RecipientsMessageListView, RecipientMessageDetailView
+from sending_messages.views import (index, RecipientsListView, RecipientDetailView, RecipientCreateView,
+                                    RecipientUpdateView, RecipientDeleteView, MailingsListView, MailingDetailView,
+                                    MailingCreateView, MailingUpdateView, MailingDeleteView)
 
 
 app_name = SendingMessagesConfig.name
 
 urlpatterns = [
     path('', index),
-    path('recipients_list', RecipientsMessageListView.as_view(), name='recipients_list'),
-    path('recipient_detail/<int:pk>', RecipientMessageDetailView.as_view(), name='recipient_detail'),
+    # Получатели
+    path('recipients_list/', RecipientsListView.as_view(), name='recipients_list'),
+    path('recipient_detail/<int:pk>/', RecipientDetailView.as_view(), name='recipient_detail'),
+    path('recipient_create/', RecipientCreateView.as_view(), name='recipient_create'),
+    path('recipient_update/<int:pk>/', RecipientUpdateView.as_view(), name='recipient_update'),
+    path('recipient_delete/<int:pk>/', RecipientDeleteView.as_view(), name='recipient_delete'),
+    # Рассылки
+    path('mailings_list/', MailingsListView.as_view(), name='mailings_list'),
+    path('mailing_detail/<int:pk>/', MailingDetailView.as_view(), name='mailing_detail'),
+    path('mailing_create/', MailingCreateView.as_view(), name='mailing_create'),
+    path('mailing_update/<int:pk>/', MailingUpdateView.as_view(), name='mailing_update'),
+    path('mailing_delete/<int:pk>/', MailingDeleteView.as_view(), name='mailing_delete'),
 ]

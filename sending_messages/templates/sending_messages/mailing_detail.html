@@ -1,0 +1,21 @@
+{% extends 'sending_messages/base.html' %}
+{% block content %}
+
+<!--suppress ALL -->
+<h2>Подробности рассылки</h2>
+<p>Название рассылки: {{ mailing.name }}</p>
+<p>Начало рассылки: {{ mailing.start_time }}</p>
+<p>Конец рассылки: {{ mailing.end_time }}</p>
+<p>Сообщение: {{ mailing.message }}</p>
+<p>Получатели рассылки:</p>
+<ul>
+{% for recipient in mailing.recipients.all %}
+    <li>{{ recipient.full_name }} ({{ recipient.email }})</li>
+{% empty %}
+    <li>Нет получателей</li>
+{% endfor %}
+</ul>
+<a href="{% url 'sending_messages:mailing_update' mailing.pk %}">Редактировать рассылку</a>
+<a href="{% url 'sending_messages:mailing_delete' mailing.pk %}">Удалить рассылку</a>
+
+{% endblock %}

@@ -4,7 +4,7 @@ from django.db.models import Manager
 from django.utils import timezone
 
 
-class RecipientMessage(models.Model):
+class Recipient(models.Model):
     """
     Модель получателя рассылки (клиента).
     """
@@ -13,8 +13,8 @@ class RecipientMessage(models.Model):
     comment = models.TextField(verbose_name='Комментарий', blank=True, null=True)
 
     # Объявление для линтера
-    object: Manager['RecipientMessage']
-    objects: Manager['RecipientMessage']
+    object: Manager['Recipient']
+    objects: Manager['Recipient']
 
     def __str__(self):
         return f'{self.full_name} {self.email}'
@@ -57,6 +57,7 @@ class Mailing(models.Model):
         (STATUS_FINISHED, "Завершена"),
     )
 
+    name = models.CharField(verbose_name='Название рассылки', max_length=50)
     start_time = models.DateTimeField(verbose_name='Дата и время начала отправки')
     end_time = models.DateTimeField(verbose_name='Дата и время окончания отправки')
     status = models.CharField(
@@ -66,20 +67,30 @@ class Mailing(models.Model):
         verbose_name="Статус рассылки"
     )
     message = models.ForeignKey(Message, on_delete=models.CASCADE, verbose_name='Сообщение')
-    recipients = models.ManyToManyField(RecipientMessage, verbose_name='Получатели')
+    recipients = models.ManyToManyField(Recipient, verbose_name='Получатели')
 
     # Объявление для линтера
     object: Manager['Mailing']
     objects: Manager['Mailing']
 
-    def clean(self):
-        now = timezone.now()
+    from django.core.exceptions import ValidationError
+    from django.utils import timezone
 
+    def clean(self):
+        super().clean()
+
+        # если одно из полей не заполнено — выходим
+        if not self.start_time or not self.end_time:
+            return
+
+        # now = timezone.now()
         # if self.start_time < now:
-        #     raise ValidationError('Дата начала не может быть в прошлом')
+        #     raise ValidationError({'start_time': 'Дата начала не может быть в прошлом'})
 
         if self.start_time >= self.end_time:
-            raise ValidationError('Дата окончания должна быть позже даты начала')
+            raise ValidationError({
+                'end_time': 'Дата окончания должна быть позже даты начала'
+            })
 
     def update_status(self):
         now = timezone.now()
