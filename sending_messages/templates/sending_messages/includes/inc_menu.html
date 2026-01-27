@@ -22,8 +22,9 @@
                     <a class="nav-link {% if request.resolver_match.url_name in menu_urls.mailings %}active{% endif %}"
                        href="{% url 'sending_messages:mailings_list' %}">Рассылки</a>
                 </li>
-                <li class="nav-item {% if request.resolver_match.url_name in menu_urls.messages %}active{% endif %}">
-                    <a class="nav-link" href="#">Сообщения</a>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name in menu_urls.messages %}active{% endif %}"
+                       href="{% url 'sending_messages:messages_list' %}">Сообщения</a>
                 </li>
             </ul>
 

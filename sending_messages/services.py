@@ -24,6 +24,10 @@ from django.conf import settings
 #
 #     return len(recipients)
 def send_mailing(mailing):
+    """
+    Отправляет письма всем получателям конкретной рассылки.
+    Принимает модель рассылки
+    """
     theme = mailing.message.theme_message
     body = mailing.message.body_message
     recipients = [recipient.email for recipient in mailing.recipients.all()]

@@ -83,9 +83,9 @@ class Mailing(models.Model):
         if not self.start_time or not self.end_time:
             return
 
-        # now = timezone.now()
-        # if self.start_time < now:
-        #     raise ValidationError({'start_time': 'Дата начала не может быть в прошлом'})
+        now = timezone.now()
+        if self.start_time < now:
+            raise ValidationError({'start_time': 'Дата начала не может быть в прошлом'})
 
         if self.start_time >= self.end_time:
             raise ValidationError({

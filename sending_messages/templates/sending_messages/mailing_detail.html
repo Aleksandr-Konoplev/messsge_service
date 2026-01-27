@@ -7,6 +7,7 @@
 <p>Начало рассылки: {{ mailing.start_time }}</p>
 <p>Конец рассылки: {{ mailing.end_time }}</p>
 <p>Сообщение: {{ mailing.message }}</p>
+<p>Статус рассылки: {{ mailing.get_status_display }}</p>
 <p>Получатели рассылки:</p>
 <ul>
 {% for recipient in mailing.recipients.all %}
@@ -15,6 +16,10 @@
     <li>Нет получателей</li>
 {% endfor %}
 </ul>
+<form method="post" action="{% url 'sending_messages:mailing_send' mailing.pk %}">
+    {% csrf_token %}
+    <button class="btn btn-success">Отправить</button>
+</form>
 <a href="{% url 'sending_messages:mailing_update' mailing.pk %}">Редактировать рассылку</a>
 <a href="{% url 'sending_messages:mailing_delete' mailing.pk %}">Удалить рассылку</a>
 

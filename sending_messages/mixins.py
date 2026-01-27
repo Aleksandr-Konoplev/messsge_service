@@ -19,6 +19,13 @@ class MenuActiveMixin:
             'recipient_update',
             'recipient_delete',
         ],
+        'messages': [
+            'message_delete',
+            'message_update',
+            'message_create',
+            'message_detail',
+            'messages_list',
+        ]
     }
 
     def get_context_data(self, **kwargs):

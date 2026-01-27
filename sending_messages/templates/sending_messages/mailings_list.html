@@ -7,7 +7,7 @@
     <!--suppress ALL -->
 <div class="col">
 
-    <a href="{% url 'sending_messages:mailing_detail' mailing.pk %}">{{ mailing.name }}</a>
+    <a href="{% url 'sending_messages:mailing_detail' mailing.pk %}">{{ mailing.name }}</a> <span>Статус: {{ mailing.get_status_display }}</span>
 </div>
 {% endfor %}
 

@@ -1,11 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from sending_messages.models import Recipient, Mailing, Message
 from sending_messages.forms import RecipientForm, MailingForm, MessageForm
 from sending_messages.mixins import MenuActiveMixin
+from sending_messages.services import send_mailing
 
 
 def index(request):
@@ -51,11 +53,22 @@ class MailingsListView(MenuActiveMixin, ListView):
     template_name = 'sending_messages/mailings_list.html'
     context_object_name = 'mailings'
 
+    # noinspection PyUnresolvedReferences
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        obj.update_status()  # ← пересчёт и сохранение статуса
+        return obj
+
 
 class MailingDetailView(MenuActiveMixin, DetailView):
     model = Mailing
     template_name = 'sending_messages/mailing_detail.html'
     context_object_name = 'mailing'
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        obj.update_status()  # ← пересчёт и сохранение статуса
+        return obj
 
 
 class MailingCreateView(MenuActiveMixin, CreateView):
@@ -79,3 +92,42 @@ class MailingDeleteView(MenuActiveMixin, DeleteView):
 
 
 # Сообщения
+class MessageListView(MenuActiveMixin, ListView):
+    model = Message
+    template_name = 'sending_messages/messages_list.html'
+    context_object_name = 'messages'
+
+
+class MessageDetailView(MenuActiveMixin, DetailView):
+    model = Message
+    template_name = 'sending_messages/message_detail.html'
+    context_object_name = 'message'
+
+
+class MessageCreateView(MenuActiveMixin, CreateView):
+    model = Message
+    form_class = MessageForm
+    template_name = 'sending_messages/form_message.html'
+    success_url = reverse_lazy('sending_messages:messages_list')
+
+
+class MessageUpdateView(MenuActiveMixin, UpdateView):
+    model = Message
+    form_class = MessageForm
+    template_name = 'sending_messages/form_message.html'
+    success_url = reverse_lazy('sending_messages:messages_list')
+
+
+class MessageDeleteView(MenuActiveMixin, DeleteView):
+    model = Message
+    template_name = 'sending_messages/message_confirm_delete.html'
+    success_url = reverse_lazy('sending_messages:messages_list')
+
+
+# Иные действия
+class MailingSendView(View):
+    @staticmethod
+    def post(request, pk, *args, **kwargs):
+        mailing = get_object_or_404(Mailing, pk=pk)
+        send_mailing(mailing)
+        return redirect('sending_messages:mailings_list')

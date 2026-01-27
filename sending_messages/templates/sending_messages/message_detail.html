@@ -1,0 +1,12 @@
+{% extends 'sending_messages/base.html' %}
+{% block content %}
+
+<!--suppress ALL -->
+<h2>Подробности сообщения</h2>
+<p>Тема сообщения: {{ message.theme_message }}</p>
+<p>Сообщение: {{ message.body_message }}</p>
+
+<a href="{% url 'sending_messages:message_update' message.pk %}">Редактировать сообщение</a>
+<a href="{% url 'sending_messages:message_delete' message.pk %}">Удалить сообщение</a>
+
+{% endblock %}
