@@ -88,8 +88,11 @@ class Mailing(models.Model):
     def update_status(self):
         """Обновление статуса рассылки с учётом времени и факта отправки"""
         previous_status = self.status
-
         now = timezone.now()
+
+        if self.status == self.STATUS_FINISHED:
+            return
+
         if now < self.start_time:
             self.status = self.STATUS_CREATED
         elif self.start_time <= now <= self.end_time:
@@ -97,6 +100,7 @@ class Mailing(models.Model):
         else:
             self.status = self.STATUS_FINISHED
 
+        # После вычисления статуса проверяем необходимость тревожить БД
         if self.status != previous_status:
             self.save(update_fields=['status'])
 

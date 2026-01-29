@@ -16,24 +16,32 @@ class MailingForm(forms.ModelForm):
     """
     Форма для создания и редактирования рассылки
     """
-    start_time = forms.DateTimeField(
-        widget=forms.DateTimeInput(attrs={
-            'type': 'datetime-local',
-            'class': 'form-control'
-        }),
-        input_formats=['%Y-%m-%dT%H:%M']
-    )
-    end_time = forms.DateTimeField(
-        widget=forms.DateTimeInput(attrs={
-            'type': 'datetime-local',
-            'class': 'form-control'
-        }),
-        input_formats=['%Y-%m-%dT%H:%M']
-    )
-
     class Meta:
         model = Mailing
         fields = ('name', 'start_time', 'end_time', 'message', 'recipients')
+
+    def __init__(self, *args, **kwargs):
+        super(MailingForm, self).__init__(*args, **kwargs)
+
+        self.fields['name'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Введите Имя'}
+        )
+
+        self.fields['start_time'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Введите дату начала в формате: "2006-10-25 14:30"'}
+        )
+
+        self.fields['end_time'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Введите дату окончания в формате: "2006-10-25 14:30"'}
+        )
+
+        self.fields['message'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Выберите сообщение'}
+        )
+
+        self.fields['recipients'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Выберите получателей'}
+        )
 
     def clean(self):
         cleaned_data = super().clean()

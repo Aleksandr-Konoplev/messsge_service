@@ -1,11 +1,12 @@
 {% extends 'sending_messages/base.html' %}
 {% block content %}
+{% load tz %}
 
 <!--suppress ALL -->
 <h2>Подробности рассылки</h2>
 <p>Название рассылки: {{ mailing.name }}</p>
-<p>Начало рассылки: {{ mailing.start_time }}</p>
-<p>Конец рассылки: {{ mailing.end_time }}</p>
+<p>Начало рассылки: {{ mailing.start_time|localtime|date:"d.m.Y H:i" }}</p>
+<p>Конец рассылки: {{ mailing.end_time|localtime|date:"d.m.Y H:i" }}</p>
 <p>Сообщение: {{ mailing.message }}</p>
 <p>Статус рассылки: {{ mailing.get_status_display }}</p>
 <p>Получатели рассылки:</p>
