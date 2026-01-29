@@ -53,11 +53,13 @@ class MailingsListView(MenuActiveMixin, ListView):
     template_name = 'sending_messages/mailings_list.html'
     context_object_name = 'mailings'
 
-    # noinspection PyUnresolvedReferences
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        obj.update_status()  # ← пересчёт и сохранение статуса
-        return obj
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        for mailing in qs:
+            mailing.update_status()
+
+        return qs
 
 
 class MailingDetailView(MenuActiveMixin, DetailView):
@@ -67,7 +69,7 @@ class MailingDetailView(MenuActiveMixin, DetailView):
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-        obj.update_status()  # ← пересчёт и сохранение статуса
+        obj.update_status()
         return obj
 
 
@@ -126,6 +128,7 @@ class MessageDeleteView(MenuActiveMixin, DeleteView):
 
 # Иные действия
 class MailingSendView(View):
+    # noinspection PyUnusedLocal
     @staticmethod
     def post(request, pk, *args, **kwargs):
         mailing = get_object_or_404(Mailing, pk=pk)

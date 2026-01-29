@@ -1,46 +1,52 @@
 from django.core.mail import send_mail
-import os
 from config.settings import EMAIL_HOST_USER
+from sending_messages.models import MailingAttempt, Mailing
 
-from django.conf import settings
 
-
-# def send_mailing(mailing):
-#     """
-#     Отправляет письма всем получателям конкретной рассылки.
-#     Принимает модель рассылки
-#     """
-#
-#     theme = mailing.message.theme_message
-#     body = mailing.message.body_message
-#     recipients = [recipient.email for recipient in mailing.recipients.all()]
-#
-#     if recipients:
-#         send_mail(subject=theme,
-#                   message=body,
-#                   from_email=EMAIL_HOST_USER,
-#                   recipient_list=recipients,
-#                   fail_silently=False)
-#
-#     return len(recipients)
 def send_mailing(mailing):
     """
     Отправляет письма всем получателям конкретной рассылки.
-    Принимает модель рассылки
     """
     theme = mailing.message.theme_message
     body = mailing.message.body_message
-    recipients = [recipient.email for recipient in mailing.recipients.all()]
+    recipients = mailing.recipients.all()
+    sent_count = 0
 
-    print(f"Отправка '{theme}' на {recipients}")  # <-- DEBUG
+    if not recipients:
+        return 'Нет получателей в рассылке'
 
-    if recipients:
-        send_mail(
-            subject=theme,
-            message=body,
-            from_email=EMAIL_HOST_USER,
-            recipient_list=recipients,
-            fail_silently=False
-        )
+    # Ставим статус "Запущена" до отправки
+    mailing.status = Mailing.STATUS_RUNNING
+    mailing.save(update_fields=['status'])
 
-    return len(recipients)
+    for recipient in recipients:
+        try:
+            send_mail(
+                subject=theme,
+                message=body,
+                from_email=EMAIL_HOST_USER,
+                recipient_list=[recipient.email],
+                fail_silently=False
+            )
+
+            MailingAttempt.objects.create(
+                mailing=mailing,
+                recipient=recipient,
+                status=MailingAttempt.STATUS_SUCCESS
+            )
+
+            sent_count += 1
+
+        except Exception as err:
+            MailingAttempt.objects.create(
+                mailing=mailing,
+                recipient=recipient,
+                status=MailingAttempt.STATUS_FAILED,
+                error_message=str(err)
+            )
+
+    # Отмечаем рассылку как отправленную
+    mailing.status = Mailing.STATUS_FINISHED
+    mailing.save(update_fields=['status'])
+
+    return sent_count

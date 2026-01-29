@@ -70,16 +70,11 @@ class Mailing(models.Model):
     recipients = models.ManyToManyField(Recipient, verbose_name='Получатели')
 
     # Объявление для линтера
-    object: Manager['Mailing']
     objects: Manager['Mailing']
-
-    from django.core.exceptions import ValidationError
-    from django.utils import timezone
 
     def clean(self):
         super().clean()
 
-        # если одно из полей не заполнено — выходим
         if not self.start_time or not self.end_time:
             return
 
@@ -88,14 +83,13 @@ class Mailing(models.Model):
             raise ValidationError({'start_time': 'Дата начала не может быть в прошлом'})
 
         if self.start_time >= self.end_time:
-            raise ValidationError({
-                'end_time': 'Дата окончания должна быть позже даты начала'
-            })
+            raise ValidationError({'end_time': 'Дата окончания должна быть позже даты начала'})
 
     def update_status(self):
-        now = timezone.now()
+        """Обновление статуса рассылки с учётом времени и факта отправки"""
         previous_status = self.status
 
+        now = timezone.now()
         if now < self.start_time:
             self.status = self.STATUS_CREATED
         elif self.start_time <= now <= self.end_time:
@@ -106,14 +100,38 @@ class Mailing(models.Model):
         if self.status != previous_status:
             self.save(update_fields=['status'])
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        self.update_status()
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f'Рассылка №{self.pk}: {self.message} ({self.status})'
 
     class Meta:
         verbose_name = "Рассылка"
         verbose_name_plural = "Рассылки"
+
+
+class MailingAttempt(models.Model):
+    """
+    Модель попыток отправки писем
+    """
+    STATUS_SUCCESS = 'success'
+    STATUS_FAILED = 'failed'
+
+    STATUS_CHOICES = (
+        (STATUS_SUCCESS, 'Успешно'),
+        (STATUS_FAILED, 'Не успешно'),
+    )
+
+    mailing = models.ForeignKey(Mailing, on_delete=models.CASCADE, related_name='attempts', verbose_name='Рассылка')
+    recipient = models.ForeignKey(Recipient, on_delete=models.CASCADE, verbose_name='Получатель')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, verbose_name='Статус попытки')
+    error_message = models.TextField(blank=True, null=True, verbose_name='Текст ошибки')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата попытки')
+
+    # Объявление для линтера
+    objects = models.Manager()
+
+    def __str__(self):
+        return f'{self.mailing} {self.recipient} ({self.status})'
+
+    class Meta:
+        verbose_name = 'Попытка отправки'
+        verbose_name_plural = 'Попытки отправки'
