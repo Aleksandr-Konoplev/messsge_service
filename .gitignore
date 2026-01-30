@@ -209,3 +209,4 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 /sending_messages/templates/sending_messages/tamplate.html
+/sending_messages/draft.py

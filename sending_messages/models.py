@@ -13,7 +13,6 @@ class Recipient(models.Model):
     comment = models.TextField(verbose_name='Комментарий', blank=True, null=True)
 
     # Объявление для линтера
-    object: Manager['Recipient']
     objects: Manager['Recipient']
 
     def __str__(self):
@@ -32,7 +31,6 @@ class Message(models.Model):
     body_message = models.TextField(verbose_name='Сообщение')
 
     # Объявление для линтера
-    object: Manager['Message']
     objects: Manager['Message']
 
     def __str__(self):
@@ -131,6 +129,7 @@ class MailingAttempt(models.Model):
 
     mailing = models.ForeignKey(Mailing, on_delete=models.CASCADE, related_name='attempts', verbose_name='Рассылка')
     recipient = models.ForeignKey(Recipient, on_delete=models.CASCADE, verbose_name='Получатель')
+    server_response = models.TextField(verbose_name='Сообщение от почтового сервера', blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, verbose_name='Статус попытки')
     error_message = models.TextField(blank=True, null=True, verbose_name='Текст ошибки')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата попытки')
