@@ -25,6 +25,9 @@ class MenuActiveMixin:
             'message_create',
             'message_detail',
             'messages_list',
+        ],
+        'main_page': [
+            'main_page'
         ]
     }
 

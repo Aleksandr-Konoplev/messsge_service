@@ -107,6 +107,24 @@ class Mailing(models.Model):
         if self.status != previous_status:
             self.save(update_fields=['status'])
 
+    @classmethod
+    def mass_update_statuses(cls):
+        """
+        Массово обновляет статусы рассылок по времени, по всем объектам модели.
+        """
+        now = timezone.now()
+
+        cls.objects.filter(
+            status__in=[cls.STATUS_CREATED, cls.STATUS_RUNNING],
+            start_time__lte=now,
+            end_time__gte=now,
+        ).exclude(status=cls.STATUS_RUNNING).update(status=cls.STATUS_RUNNING)
+
+        cls.objects.filter(
+            status__in=[cls.STATUS_CREATED, cls.STATUS_RUNNING],
+            end_time__lt=now,
+        ).exclude(status=cls.STATUS_FINISHED).update(status=cls.STATUS_FINISHED)
+
     def __str__(self):
         return f'Рассылка №{self.pk}: {self.message} ({self.status})'
 

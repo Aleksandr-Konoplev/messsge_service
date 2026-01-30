@@ -1,8 +1,3 @@
-from django.core.mail import send_mail, EmailMessage, get_connection
-from config.settings import EMAIL_HOST_USER
-from sending_messages.models import MailingAttempt, Mailing
-
-
 from django.core.mail import EmailMessage, get_connection
 from django.conf import settings
 from sending_messages.models import MailingAttempt, Mailing

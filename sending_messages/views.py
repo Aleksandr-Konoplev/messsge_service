@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views import View
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from sending_messages.models import Recipient, Mailing, Message
@@ -12,6 +13,32 @@ from sending_messages.services import send_mailing
 
 def index(request):
     return render(request, 'sending_messages/base.html')
+
+# Главная
+class MainPageTemplateView(MenuActiveMixin ,TemplateView):
+    template_name = 'sending_messages/main_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Приводим статусы в актуальное состояние
+        Mailing.mass_update_statuses()
+
+        # now = timezone.now()
+
+        # Добавляем контекст
+        # Общее кол-во рассылок
+        context['mailings_total'] = Mailing.objects.count()
+        # Объекты со статусом "запущенна"
+        context['mailings_running'] = Mailing.objects.filter(
+            status=Mailing.STATUS_RUNNING,
+            # start_time__lte=now,
+            # end_time__gte=now,
+        ).count()
+        # Кол-во получателей
+        context['recipients_total'] = Recipient.objects.count()
+
+        return context
 
 
 # Получатели рассылки
