@@ -1,0 +1,71 @@
+<!--suppress ALL -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
+    <div class="container">
+
+        <a class="navbar-brand" href="{% url 'sending_messages:recipients_list' %}">
+            MessageService
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <!-- Левая часть -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name in menu_urls.main_page %}active{% endif %}"
+                       href="{% url 'sending_messages:main_page' %}">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name in menu_urls.recipients %}active{% endif %}"
+                       href="{% url 'sending_messages:recipients_list' %}">Получатели</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name in menu_urls.messages %}active{% endif %}"
+                       href="{% url 'sending_messages:messages_list' %}">Сообщения</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name in menu_urls.mailings %}active{% endif %}"
+                       href="{% url 'sending_messages:mailings_list' %}">Рассылки</a>
+                </li>
+            </ul>
+
+            <!-- Правая часть: кнопки -->
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                {{% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center"
+                       href="#"
+                       id="userDropdown"
+                       role="button"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false"
+                       style="height: 50px; padding: 0 0.5rem;">
+                        <span class="d-none d-lg-inline" style="line-height: 40px;">{{ user.email }}</span>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                        <li class="dropdown-item-text small text-muted">{{ user.email }}</li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="{% url 'users:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger">Выйти</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:login' %}" style="padding: 0.5rem 1rem;">Войти</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:register' %}" style="padding: 0.5rem 1rem;">Регистрация</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

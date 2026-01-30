@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!--suppress ALL -->
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Войти</button>
+</form>
+<a href="#">Сбросить пароль</a>
+
+{% endblock %}

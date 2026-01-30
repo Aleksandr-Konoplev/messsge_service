@@ -30,7 +30,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'sending_messages'
+    # My app
+    'sending_messages',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -48,7 +50,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -108,11 +110,20 @@ USE_TZ = True
 
 TIME_ZONE = "UTC"
 
+# Определяем под id тип поле BigAutoField
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Указываем нашу кастомную модель для авторизации
+AUTH_USER_MODEL = 'users.User'
+# Настройки редиректов Login и Logout
+LOGIN_REDIRECT_URL = 'sending_messages:main_page'
+LOGOUT_REDIRECT_URL = 'users:login'
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
+# Настройка меди файлов (папок)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 

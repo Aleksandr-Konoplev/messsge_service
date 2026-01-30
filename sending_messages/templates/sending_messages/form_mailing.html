@@ -1,4 +1,4 @@
-{% extends 'sending_messages/base.html' %}
+{% extends 'base.html' %}
 {% block content %}
 <!-- Форма -->
 <div class="card mb-4 border-0 shadow-sm">
@@ -14,4 +14,44 @@
         </form>
     </div>
 </div>
+
+<!-- Подключение Flatpickr -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<!-- Инициализация Flatpickr -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* функция прибавляет указанное количество минут */
+    function utcPlusMinutes(minutes) {
+        const date = new Date();
+        date.setUTCMinutes(date.getUTCMinutes() + minutes);
+        return date
+            .toISOString()
+            .slice(0, 16)
+            .replace('T', ' ');
+    }
+
+    flatpickr("input[name='start_time']", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        time_24hr: true,
+        allowInput: true,
+        utc: true,
+        defaultDate: utcPlusMinutes(1)
+    });
+
+    flatpickr("input[name='end_time']", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        time_24hr: true,
+        allowInput: true,
+        utc: true,
+        defaultDate: utcPlusMinutes(30)
+    });
+});
+</script>
+
 {% endblock %}

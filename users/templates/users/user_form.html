@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!--suppress ALL -->
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div>
+        <button type="submit" class="btn btn-outline-primary">
+            Зарегистрироваться
+        </button>
+        <a href="#" class="btn btn-outline-secondary">
+            Назад
+        </a>
+    </div>
+</form>
+{% endblock %}
