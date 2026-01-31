@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Manager
 from django.utils import timezone
+from users.models import User
 
 
 class Recipient(models.Model):
@@ -11,6 +12,15 @@ class Recipient(models.Model):
     email = models.EmailField(unique=True, verbose_name='Email')
     full_name = models.CharField(max_length=255, verbose_name='Полное имя')
     comment = models.TextField(verbose_name='Комментарий', blank=True, null=True)
+
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='recipients',
+        null=True,
+        blank=True,
+        verbose_name='Продавец'
+    )
 
     # Объявление для линтера
     objects: Manager['Recipient']
@@ -29,6 +39,14 @@ class Message(models.Model):
     """
     theme_message = models.CharField(verbose_name='Тема письма', max_length=255)
     body_message = models.TextField(verbose_name='Сообщение')
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='messages',
+        null=True,
+        blank=True,
+        verbose_name='Продавец'
+    )
 
     # Объявление для линтера
     objects: Manager['Message']
@@ -66,6 +84,14 @@ class Mailing(models.Model):
     )
     message = models.ForeignKey(Message, on_delete=models.CASCADE, verbose_name='Сообщение')
     recipients = models.ManyToManyField(Recipient, verbose_name='Получатели')
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='mailings',
+        null=True,
+        blank=True,
+        verbose_name='Продавец'
+    )
 
     # Объявление для линтера
     objects: Manager['Mailing']
@@ -108,22 +134,38 @@ class Mailing(models.Model):
             self.save(update_fields=['status'])
 
     @classmethod
-    def mass_update_statuses(cls):
+    def mass_update_statuses(cls, user=None):
         """
         Массово обновляет статусы рассылок по времени, по всем объектам модели.
         """
         now = timezone.now()
 
-        cls.objects.filter(
+        # cls.objects.filter(
+        #     status__in=[cls.STATUS_CREATED, cls.STATUS_RUNNING],
+        #     start_time__lte=now,
+        #     end_time__gte=now,
+        # ).exclude(status=cls.STATUS_RUNNING).update(status=cls.STATUS_RUNNING)
+        #
+        # cls.objects.filter(
+        #     status__in=[cls.STATUS_CREATED, cls.STATUS_RUNNING],
+        #     end_time__lt=now,
+        # ).exclude(status=cls.STATUS_FINISHED).update(status=cls.STATUS_FINISHED)
+
+        qs = cls.objects.all()
+        if user:
+            qs = qs.filter(owner=user)
+
+        qs.filter(
             status__in=[cls.STATUS_CREATED, cls.STATUS_RUNNING],
             start_time__lte=now,
             end_time__gte=now,
         ).exclude(status=cls.STATUS_RUNNING).update(status=cls.STATUS_RUNNING)
 
-        cls.objects.filter(
+        qs.filter(
             status__in=[cls.STATUS_CREATED, cls.STATUS_RUNNING],
             end_time__lt=now,
         ).exclude(status=cls.STATUS_FINISHED).update(status=cls.STATUS_FINISHED)
+
 
     def __str__(self):
         return f'Рассылка №{self.pk}: {self.message} ({self.status})'

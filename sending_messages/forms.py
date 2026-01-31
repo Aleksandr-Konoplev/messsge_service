@@ -10,6 +10,7 @@ class RecipientForm(forms.ModelForm):
     class Meta:
         model = Recipient
         fields = ('email', 'full_name', 'comment')
+        exclude = ('owner',)
 
 
 class MailingForm(forms.ModelForm):
@@ -19,6 +20,7 @@ class MailingForm(forms.ModelForm):
     class Meta:
         model = Mailing
         fields = ('name', 'start_time', 'end_time', 'message', 'recipients')
+        exclude = ('owner',)
 
     def __init__(self, *args, **kwargs):
         super(MailingForm, self).__init__(*args, **kwargs)
@@ -69,3 +71,4 @@ class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
         fields = ('theme_message', 'body_message')
+        exclude = ('owner',)
