@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2>Профиль пользователя</h2>
+
+    <div class="card mt-3" style="max-width: 600px;">
+        <div class="card-body">
+
+            <p>
+                <strong>Email:</strong>
+                {{ user_obj.email }}
+            </p>
+
+            <p>
+                <strong>Статус email:</strong>
+                {% if user_obj.is_email_verified %}
+                    <span style="color: green;">Подтверждён</span>
+                {% else %}
+                    <span style="color: red;">Не подтверждён</span>
+                {% endif %}
+            </p>
+
+            <p>
+                <strong>Аккаунт активен:</strong>
+                {% if user_obj.is_active %}
+                    Да
+                {% else %}
+                    Нет
+                {% endif %}
+            </p>
+
+            <p>
+                <strong>Дата регистрации:</strong>
+                {{ user_obj.date_joined|date:"d.m.Y H:i" }}
+            </p>
+
+            <p>
+                <strong>Последний вход:</strong>
+                {% if user_obj.last_login %}
+                    {{ user_obj.last_login|date:"d.m.Y H:i" }}
+                {% else %}
+                    —
+                {% endif %}
+            </p>
+
+            <hr>
+
+            <div class="d-flex gap-2">
+                <a href="{% url 'users:password_reset' %}" class="btn btn-outline-primary">
+                    Сменить пароль
+                </a>
+
+                <form method="post" action="{% url 'users:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="btn btn-outline-danger">
+                        Выйти
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
