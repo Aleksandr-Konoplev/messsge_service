@@ -33,16 +33,17 @@ class MainPageTemplateView(MenuActiveMixin ,TemplateView):
             # Приводим статусы в актуальное состояние
             Mailing.mass_update_statuses(user=user)
             # Добавляем контекст
-            # Общее кол-во рассылок
-            context['mailings_total'] = Mailing.objects.filter(owner=user).count()
-            # Объекты со статусом "запущенна"
-            context['mailings_running'] = Mailing.objects.filter(owner=user, status=Mailing.STATUS_RUNNING).count()
-            # Кол-во получателей
-            context['recipients_total'] = Recipient.objects.filter(owner=user).count()
+            add_context = {'mailings_total': Mailing.objects.filter(owner=user).count(),
+                           'mailings_running': Mailing.objects.filter(owner=user, status=Mailing.STATUS_RUNNING).count(),
+                           'recipients_total': Recipient.objects.filter(owner=user).count()}
+            context.update(add_context)
         else:
-            context['mailings_total'] = 'Доступно только авторизованным пользователям'
-            context['mailings_running'] = 'Доступно только авторизованным пользователям'
-            context['recipients_total'] = 'Доступно только авторизованным пользователям'
+
+            add_context = {'mailings_total': 'Нужна регистрация',
+                           'mailings_running': 'Нужна регистрация',
+                           'recipients_total': 'Нужна регистрация',}
+            context.update(add_context)
+
 
 
         return context
