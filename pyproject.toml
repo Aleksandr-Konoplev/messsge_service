@@ -17,6 +17,7 @@ psycopg2 = "^2.9.11"
 dotenv = "^0.9.9"
 ipython = "^9.9.0"
 django-stubs = "^5.2.9"
+redis = "^7.1.0"
 
 
 [build-system]

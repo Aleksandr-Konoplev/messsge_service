@@ -5,9 +5,17 @@
 ---
 
 ## Технологии
-* Python 3.13
-* Django 6.0.1
-* Poetry для управления зависимостями
+* python = 3.13
+* flake8 = 7.3.0
+* black = 26.1.0
+* mypy = 1.19.1
+* isort = 7.0.0
+* django = 6.0.1
+* psycopg2 = 2.9.11
+* dotenv = 0.9.9
+* ipython = 9.9.0
+* django-stubs = 5.2.9
+* redis = 7.1.0
 
 ---
 

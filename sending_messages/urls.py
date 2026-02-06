@@ -19,13 +19,11 @@ from sending_messages.views import (
     RecipientDetailView,
     RecipientsListView,
     RecipientUpdateView,
-    index,
 )
 
 app_name = SendingMessagesConfig.name
 
 urlpatterns = [
-    path("index/", index),
     # Главная
     path("", MainPageTemplateView.as_view(), name="main_page"),
     # Получатели

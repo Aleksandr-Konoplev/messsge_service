@@ -8,10 +8,9 @@ from sending_messages.forms import MailingForm, MessageForm, RecipientForm
 from sending_messages.mixins import MenuActiveMixin, OwnerOrManagerMixin
 from sending_messages.models import Mailing, Message, Recipient
 from sending_messages.services import send_mailing
-
-
-def index(request):
-    return render(request, "sending_messages/base.html")
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+from django.core.cache import cache
 
 
 #                    Главная
@@ -47,6 +46,7 @@ class MainPageTemplateView(MenuActiveMixin, TemplateView):
 
 #              Получатели рассылки
 #################################################
+@method_decorator(cache_page(60 * 3), name="dispatch")
 class RecipientsListView(OwnerOrManagerMixin, MenuActiveMixin, ListView):
     model = Recipient
     template_name = "sending_messages/recipients_list.html"
@@ -61,6 +61,7 @@ class RecipientsListView(OwnerOrManagerMixin, MenuActiveMixin, ListView):
         return qs.filter(owner=user)
 
 
+@method_decorator(cache_page(60 * 3), name="dispatch")
 class RecipientDetailView(OwnerOrManagerMixin, MenuActiveMixin, DetailView):
     model = Recipient
     template_name = "sending_messages/recipient_detail.html"
@@ -137,7 +138,17 @@ class MailingDetailView(OwnerOrManagerMixin, MenuActiveMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["attempts"] = self.object.attempts.select_related("recipient").order_by("-created_at")
+
+        mailing_id = self.object.pk
+        cache_key = f"mailing_attempts_{mailing_id}"
+
+        attempts = cache.get(cache_key)
+        if not attempts:
+            attempts = self.object.attempts.select_related("recipient").order_by("-created_at")
+        cache.set(cache_key, attempts, 60 * 3)
+
+        context["mailing_attempts"] = attempts
+
         return context
 
 
@@ -145,7 +156,6 @@ class MailingCreateView(OwnerOrManagerMixin, MenuActiveMixin, CreateView):
     """
     Создание рассылки (Mailing) с фильтрацией Получателей (Recipients) и Сообщений (Messages)
     """
-
     model = Mailing
     form_class = MailingForm
     template_name = "sending_messages/form_mailing.html"
