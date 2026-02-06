@@ -7,12 +7,10 @@
 
     <div class="card mt-3" style="max-width: 600px;">
         <div class="card-body">
-
             <p>
                 <strong>Email:</strong>
                 {{ user_obj.email }}
             </p>
-
             <p>
                 <strong>Статус email:</strong>
                 {% if user_obj.is_email_verified %}
@@ -21,7 +19,6 @@
                     <span style="color: red;">Не подтверждён</span>
                 {% endif %}
             </p>
-
             <p>
                 <strong>Аккаунт активен:</strong>
                 {% if user_obj.is_active %}
@@ -30,7 +27,6 @@
                     Нет
                 {% endif %}
             </p>
-
             <p>
                 <strong>Дата регистрации:</strong>
                 {{ user_obj.date_joined|date:"d.m.Y H:i" }}
@@ -44,9 +40,7 @@
                     —
                 {% endif %}
             </p>
-
             <hr>
-
             <div class="d-flex gap-2">
                 <a href="{% url 'users:password_reset' %}" class="btn btn-outline-primary">
                     Сменить пароль
@@ -60,9 +54,45 @@
                     </button>
                 </form>
             </div>
-
         </div>
     </div>
+
+    <h5 class="mt-4">Попытки рассылок</h5>
+
+    <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Рассылка</th>
+            <th>Получатель</th>
+            <th>Статус</th>
+            <th>Ответ сервера</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for attempt in attempts %}
+            <tr>
+                <td>{{ attempt.created_at|date:"d.m.Y H:i" }}</td>
+                <td>{{ attempt.mailing }}</td>
+                <td>{{ attempt.recipient }}</td>
+                <td>
+                    {% if attempt.status == 'success' %}
+                        <span class="text-success">Успешно</span>
+                    {% else %}
+                        <span class="text-danger">Ошибка</span>
+                    {% endif %}
+                </td>
+                <td>{{ attempt.server_response|default:"—" }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5">Попыток пока нет</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 
 </div>
 {% endblock %}

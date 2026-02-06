@@ -4,13 +4,17 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import CreateView, TemplateView
 from django.urls import reverse_lazy, reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
 
+from sending_messages.models import MailingAttempt
 from users.forms import UserRegisterForm
 from users.models import User
 from config.settings import EMAIL_HOST_USER
+from sending_messages.mixins import OwnerOrManagerMixin
 
 
+#############################
+### Создание пользователя ###
+#############################
 class UserCreateView(CreateView):
     model = User
     form_class = UserRegisterForm
@@ -41,10 +45,22 @@ def email_verification(request, token):
     return redirect(reverse("users:login"))
 
 
-class ProfileView(LoginRequiredMixin, TemplateView):
+############################
+### Профиль пользователя ###
+############################
+class ProfileView(OwnerOrManagerMixin, TemplateView):
     template_name = "users/profile.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["user_obj"] = self.request.user
+        user = self.request.user
+        context["user_obj"] = user
+
+        context["attempts"] = (
+            MailingAttempt.objects
+            .filter(mailing__owner=user)
+            .select_related("mailing", "recipient")
+            .order_by("-created_at")
+        )
+
         return context

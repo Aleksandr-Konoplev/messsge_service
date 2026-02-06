@@ -211,3 +211,4 @@ __marimo__/
 /sending_messages/templates/sending_messages/tamplate.html
 /sending_messages/draft.py
 /draft/
+/draft.py

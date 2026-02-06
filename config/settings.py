@@ -116,6 +116,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Указываем нашу кастомную модель для авторизации
 AUTH_USER_MODEL = 'users.User'
 # Настройки редиректов Login и Logout
+LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = 'sending_messages:main_page'
 LOGOUT_REDIRECT_URL = 'users:login'
 

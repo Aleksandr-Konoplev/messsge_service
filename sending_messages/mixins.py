@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 # Для OwnerMixin
 # from django.views import View
 # from django.core.exceptions import PermissionDenied
-# from django.views.generic.edit import ModelFormMixin
+from django.views.generic.edit import ModelFormMixin, CreateView
 # from django.views.generic.list import MultipleObjectMixin
 
 
@@ -61,21 +61,27 @@ class OwnerOrManagerMixin(LoginRequiredMixin):
         qs = super().get_queryset()
         user = self.request.user
 
+        # Суперпользователь и менеджер видят все объекты
         if user.is_superuser or user.is_staff:
             return qs
 
+        # Обычный пользователь — только свои
         return qs.filter(owner=user)
 
     def dispatch(self, request, *args, **kwargs):
-        # Запрет редактирования для менеджера
-        if request.method in ('POST', 'PUT', 'PATCH', 'DELETE'):
-            obj = getattr(self, 'get_object', lambda: None)()
+        # Запрет редактирования для менеджера, но только если это НЕ CreateView
+        if request.method in ('POST', 'PUT', 'PATCH', 'DELETE') and not isinstance(self, CreateView):
+            obj = None
+            # Только если у вьюхи есть get_object
+            if hasattr(self, 'get_object'):
+                obj = self.get_object()
             if obj and request.user.is_staff and not request.user.is_superuser:
                 raise PermissionDenied("Менеджер не может изменять данные")
 
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        # Для новых объектов присваиваем владельца
         if not form.instance.pk:
             form.instance.owner = self.request.user
         return super().form_valid(form)
