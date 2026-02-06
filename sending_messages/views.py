@@ -22,16 +22,21 @@ class MainPageTemplateView(MenuActiveMixin ,TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
-        # Приводим статусы в актуальное состояние
-        Mailing.mass_update_statuses(user=user)
+        if self.request.user.is_authenticated:
+            # Приводим статусы в актуальное состояние
+            Mailing.mass_update_statuses(user=user)
+            # Добавляем контекст
+            # Общее кол-во рассылок
+            context['mailings_total'] = Mailing.objects.filter(owner=user).count()
+            # Объекты со статусом "запущенна"
+            context['mailings_running'] = Mailing.objects.filter(owner=user, status=Mailing.STATUS_RUNNING).count()
+            # Кол-во получателей
+            context['recipients_total'] = Recipient.objects.filter(owner=user).count()
+        else:
+            context['mailings_total'] = 'Доступно только авторизованным пользователям'
+            context['mailings_running'] = 'Доступно только авторизованным пользователям'
+            context['recipients_total'] = 'Доступно только авторизованным пользователям'
 
-        # Добавляем контекст
-        # Общее кол-во рассылок
-        context['mailings_total'] = Mailing.objects.filter(owner=user).count()
-        # Объекты со статусом "запущенна"
-        context['mailings_running'] = Mailing.objects.filter(owner=user, status=Mailing.STATUS_RUNNING).count()
-        # Кол-во получателей
-        context['recipients_total'] = Recipient.objects.filter(owner=user).count()
 
         return context
 
@@ -112,6 +117,15 @@ class MailingDetailView(MenuActiveMixin, DetailView):
         obj = super().get_object(queryset)
         obj.update_status()
         return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['attempts'] = (
+            self.object.attempts
+            .select_related('recipient')
+            .order_by('-created_at')
+        )
+        return context
 
 
 class MailingCreateView(MenuActiveMixin, CreateView):

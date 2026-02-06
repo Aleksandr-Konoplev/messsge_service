@@ -152,3 +152,97 @@ message_service/
 - Управление списками получателей.
 - Привязка рассылок к конкретным пользователям (owner).  
 - Простая и удобная админ-панель для управления всем процессом.
+
+
+
+---
+---
+---
+---
+```commandline
+message_service/                         # Корневая папка проекта
+│
+├── .venv/                               # Виртуальное окружение Python
+├── config/                              # Основные настройки Django проекта
+│   ├── __init__.py
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── urls.py                          # Главный URL-конфиг проекта
+│   └── wsgi.py
+│
+├── sending_messages/                    # Приложение для отправки сообщений
+│   ├── management/
+│   │   └── commands/                    # Кастомные команды management
+│   │       └── test_mailing.py
+│   ├── migrations/                      # Миграции базы данных
+│   ├── templates/                       # Шаблоны приложения
+│   │   └── sending_messages/
+│   │       ├── form_mailing.html
+│   │       ├── form_message.html
+│   │       ├── form_recipient.html
+│   │       ├── mailing_confirm_delete.html
+│   │       ├── mailing_detail.html
+│   │       ├── mailings_list.html
+│   │       ├── main_page.html
+│   │       ├── message_confirm_delete.html
+│   │       ├── message_detail.html
+│   │       ├── messages_list.html
+│   │       ├── recipient_confirm_delete.html
+│   │       ├── recipient_detail.html
+│   │       ├── recipients_list.html
+│   │       └── template.html
+│   │
+│   ├── __init__.py
+│   ├── admin.py                         # Админ-панель
+│   ├── apps.py                          # Конфигурация приложения
+│   ├── forms.py                         # Формы
+│   ├── mixins.py                        # Миксины для представлений
+│   ├── models.py                        # Модели данных
+│   ├── services.py                      # Бизнес-логика
+│   ├── tests.py                         # Тесты
+│   ├── urls.py                          # URL-маршруты приложения
+│   └── views.py                         # Представления
+│
+├── users/                               # Приложение пользователей
+│   ├── management/
+│   │   └── commands/
+│   │       └── custom_createsuperuser.py # Кастомная команда создания суперпользователя
+│   ├── migrations/
+│   ├── templates/
+│   │   └── users/
+│   │       ├── login.html
+│   │       ├── password_reset_complete.html
+│   │       ├── password_reset_confirm.html
+│   │       ├── password_reset_done.html
+│   │       ├── password_reset_email.html
+│   │       ├── password_reset_form.html
+│   │       ├── profile.html
+│   │       └── user_form.html
+│   │
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+│
+├── templates/                           # Общие шаблоны проекта
+│   ├── includes/
+│   │   └── inc_menu.html                # Включение меню
+│   └── base.html                        # Базовый шаблон
+│
+├── static/                              # Статические файлы
+│   ├── css/
+│   └── js/
+│
+├── draft/                               # Черновики или временные файлы
+├── media/                               # Загружаемые пользователем файлы
+│
+├── .env                                 # Переменные окружения
+├── .fake18                              # Файл для поддельных данных (возможно для тестов)
+├── .gitignore                           # Игнорируемые Git файлы
+├── __init__.py
+└── manage.py                            # Основной скрипт управления Django
+```
