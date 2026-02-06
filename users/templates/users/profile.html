@@ -57,42 +57,6 @@
         </div>
     </div>
 
-    <h5 class="mt-4">Попытки рассылок</h5>
-
-    <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Дата</th>
-            <th>Рассылка</th>
-            <th>Получатель</th>
-            <th>Статус</th>
-            <th>Ответ сервера</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        {% for attempt in attempts %}
-            <tr>
-                <td>{{ attempt.created_at|date:"d.m.Y H:i" }}</td>
-                <td>{{ attempt.mailing }}</td>
-                <td>{{ attempt.recipient }}</td>
-                <td>
-                    {% if attempt.status == 'success' %}
-                        <span class="text-success">Успешно</span>
-                    {% else %}
-                        <span class="text-danger">Ошибка</span>
-                    {% endif %}
-                </td>
-                <td>{{ attempt.server_response|default:"—" }}</td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="5">Попыток пока нет</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
 
 </div>
 {% endblock %}

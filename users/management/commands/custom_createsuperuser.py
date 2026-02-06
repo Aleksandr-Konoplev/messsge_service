@@ -1,11 +1,12 @@
-from django.core.management.base import BaseCommand
-from users.models import User
 from getpass import getpass
+
+from django.core.management.base import BaseCommand
+
+from users.models import User
 
 
 class Command(BaseCommand):
     help = "Создаёт суперпользователя с email super-us@mail.ru"
-
 
     def handle(self, *args, **options):
         email = "super-us@mail.ru"
@@ -24,12 +25,7 @@ class Command(BaseCommand):
             break
 
         # Создаём суперпользователя
-        user = User.objects.create(
-            email=email,
-            is_active=True,
-            is_staff=True,
-            is_superuser=True
-        )
+        user = User.objects.create(email=email, is_active=True, is_staff=True, is_superuser=True)
         user.set_password(password)
         user.save()
 

@@ -16,8 +16,13 @@ django = "^6.0.1"
 psycopg2 = "^2.9.11"
 dotenv = "^0.9.9"
 ipython = "^9.9.0"
+django-stubs = "^5.2.9"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+# максимальная длина строки
+line-length = 119

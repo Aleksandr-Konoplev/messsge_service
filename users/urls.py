@@ -1,12 +1,9 @@
-from django.contrib.auth.views import LoginView, LogoutView
-from django.urls import path
 from django.contrib.auth import views as auth_views
-from django.urls import reverse_lazy
-
+from django.contrib.auth.views import LoginView, LogoutView
+from django.urls import path, reverse_lazy
 
 from users.apps import UsersConfig
-from users.views import UserCreateView, email_verification, ProfileView
-
+from users.views import ProfileView, UserCreateView, email_verification
 
 app_name = UsersConfig.name
 
@@ -16,22 +13,19 @@ urlpatterns = [
     path("register/", UserCreateView.as_view(), name="register"),
     path("email-confirm/<str:token>/", email_verification, name="email-confirm"),
     path("profile/", ProfileView.as_view(), name="profile"),
-
     # Востаановление пароля
     path(
         "password-reset/",
         auth_views.PasswordResetView.as_view(
             template_name="users/password_reset_form.html",
             email_template_name="users/password_reset_email.html",
-            success_url="done/"
+            success_url="done/",
         ),
         name="password_reset",
     ),
     path(
         "password-reset/done/",
-        auth_views.PasswordResetDoneView.as_view(
-            template_name="users/password_reset_done.html"
-        ),
+        auth_views.PasswordResetDoneView.as_view(template_name="users/password_reset_done.html"),
         name="password_reset_done",
     ),
     path(
@@ -44,9 +38,7 @@ urlpatterns = [
     ),
     path(
         "reset/done/",
-        auth_views.PasswordResetCompleteView.as_view(
-            template_name="users/password_reset_complete.html"
-        ),
+        auth_views.PasswordResetCompleteView.as_view(template_name="users/password_reset_complete.html"),
         name="password_reset_complete",
     ),
 ]

@@ -1,6 +1,7 @@
-from django.core.mail import EmailMessage, get_connection
 from django.conf import settings
-from sending_messages.models import MailingAttempt, Mailing
+from django.core.mail import EmailMessage, get_connection
+
+from sending_messages.models import Mailing, MailingAttempt
 
 
 def send_mailing(mailing):
@@ -15,12 +16,12 @@ def send_mailing(mailing):
 
     if not recipients.exists():
         mailing.status = Mailing.STATUS_FINISHED
-        mailing.save(update_fields=['status'])
+        mailing.save(update_fields=["status"])
         return 0
 
     # Переводим рассылку в статус "Запущена"
     mailing.status = Mailing.STATUS_RUNNING
-    mailing.save(update_fields=['status'])
+    mailing.save(update_fields=["status"])
 
     sent_count = 0
 
@@ -55,7 +56,7 @@ def send_mailing(mailing):
                     mailing=mailing,
                     recipient=recipient,
                     status=MailingAttempt.STATUS_SUCCESS,
-                    server_response=f'{smtp_code} - {smtp_message.decode()}',
+                    server_response=f"{smtp_code} - {smtp_message.decode()}",
                 )
 
                 sent_count += 1
@@ -70,7 +71,7 @@ def send_mailing(mailing):
                 )
 
     except Exception as err:
-        raise Exception(f'Не удалось установить соединение - {err}')
+        raise Exception(f"Не удалось установить соединение - {err}")
 
     finally:
         # Закрываем SMTP-соединение
@@ -78,6 +79,6 @@ def send_mailing(mailing):
 
     # Отмечаем рассылку как завершённую
     mailing.status = Mailing.STATUS_FINISHED
-    mailing.save(update_fields=['status'])
+    mailing.save(update_fields=["status"])
 
     return sent_count

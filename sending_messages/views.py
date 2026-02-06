@@ -1,29 +1,23 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.utils import timezone
 from django.views import View
-from django.views.generic import ListView, DetailView, TemplateView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from sending_messages.models import Recipient, Mailing, Message
-from sending_messages.forms import RecipientForm, MailingForm, MessageForm
+from sending_messages.forms import MailingForm, MessageForm, RecipientForm
 from sending_messages.mixins import MenuActiveMixin, OwnerOrManagerMixin
+from sending_messages.models import Mailing, Message, Recipient
 from sending_messages.services import send_mailing
 
 
-from django.views.generic import CreateView
-from django.urls import reverse_lazy
-from sending_messages.models import Mailing, Recipient, Message
-from sending_messages.forms import MailingForm
-from sending_messages.mixins import OwnerOrManagerMixin, MenuActiveMixin
-
-
 def index(request):
-    return render(request, 'sending_messages/base.html')
+    return render(request, "sending_messages/base.html")
 
-# Главная
-class MainPageTemplateView(MenuActiveMixin ,TemplateView):
-    template_name = 'sending_messages/main_page.html'
+
+#                    Главная
+#################################################
+class MainPageTemplateView(MenuActiveMixin, TemplateView):
+    template_name = "sending_messages/main_page.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -33,29 +27,30 @@ class MainPageTemplateView(MenuActiveMixin ,TemplateView):
             # Приводим статусы в актуальное состояние
             Mailing.mass_update_statuses(user=user)
             # Добавляем контекст
-            add_context = {'mailings_total': Mailing.objects.filter(owner=user).count(),
-                           'mailings_running': Mailing.objects.filter(owner=user, status=Mailing.STATUS_RUNNING).count(),
-                           'recipients_total': Recipient.objects.filter(owner=user).count()}
+            add_context = {
+                "mailings_total": Mailing.objects.filter(owner=user).count(),
+                "mailings_running": Mailing.objects.filter(owner=user, status=Mailing.STATUS_RUNNING).count(),
+                "recipients_total": Recipient.objects.filter(owner=user).count(),
+            }
             context.update(add_context)
         else:
 
-            add_context = {'mailings_total': 'Нужна регистрация',
-                           'mailings_running': 'Нужна регистрация',
-                           'recipients_total': 'Нужна регистрация',}
+            add_context = {
+                "mailings_total": "Нужна регистрация",
+                "mailings_running": "Нужна регистрация",
+                "recipients_total": "Нужна регистрация",
+            }
             context.update(add_context)
-
-
 
         return context
 
 
-###########################
-### Получатели рассылки ###
-###########################
+#              Получатели рассылки
+#################################################
 class RecipientsListView(OwnerOrManagerMixin, MenuActiveMixin, ListView):
     model = Recipient
-    template_name = 'sending_messages/recipients_list.html'
-    context_object_name = 'recipients'
+    template_name = "sending_messages/recipients_list.html"
+    context_object_name = "recipients"
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -68,8 +63,8 @@ class RecipientsListView(OwnerOrManagerMixin, MenuActiveMixin, ListView):
 
 class RecipientDetailView(OwnerOrManagerMixin, MenuActiveMixin, DetailView):
     model = Recipient
-    template_name = 'sending_messages/recipient_detail.html'
-    context_object_name = 'recipient'
+    template_name = "sending_messages/recipient_detail.html"
+    context_object_name = "recipient"
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -83,8 +78,8 @@ class RecipientDetailView(OwnerOrManagerMixin, MenuActiveMixin, DetailView):
 class RecipientCreateView(OwnerOrManagerMixin, MenuActiveMixin, CreateView):
     model = Recipient
     form_class = RecipientForm
-    template_name = 'sending_messages/form_recipient.html'
-    success_url = reverse_lazy('sending_messages:recipients_list')
+    template_name = "sending_messages/form_recipient.html"
+    success_url = reverse_lazy("sending_messages:recipients_list")
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -94,28 +89,22 @@ class RecipientCreateView(OwnerOrManagerMixin, MenuActiveMixin, CreateView):
 class RecipientUpdateView(OwnerOrManagerMixin, MenuActiveMixin, UpdateView):
     model = Recipient
     form_class = RecipientForm
-    template_name = 'sending_messages/form_recipient.html'
-    success_url = reverse_lazy('sending_messages:recipients_list')
-
-    def get_queryset(self):
-        return super().get_queryset().filter(owner=self.request.user)
+    template_name = "sending_messages/form_recipient.html"
+    success_url = reverse_lazy("sending_messages:recipients_list")
 
 
 class RecipientDeleteView(OwnerOrManagerMixin, MenuActiveMixin, DeleteView):
     model = Recipient
-    template_name = 'sending_messages/recipient_confirm_delete.html'
-    success_url = reverse_lazy('sending_messages:recipients_list')
+    template_name = "sending_messages/recipient_confirm_delete.html"
+    success_url = reverse_lazy("sending_messages:recipients_list")
 
-    def get_queryset(self):
-        return super().get_queryset().filter(owner=self.request.user)
 
-################
-### Рассылки ###
-################
+#                    Рассылки
+#################################################
 class MailingsListView(OwnerOrManagerMixin, MenuActiveMixin, ListView):
     model = Mailing
-    template_name = 'sending_messages/mailings_list.html'
-    context_object_name = 'mailings'
+    template_name = "sending_messages/mailings_list.html"
+    context_object_name = "mailings"
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -131,8 +120,8 @@ class MailingsListView(OwnerOrManagerMixin, MenuActiveMixin, ListView):
 
 class MailingDetailView(OwnerOrManagerMixin, MenuActiveMixin, DetailView):
     model = Mailing
-    template_name = 'sending_messages/mailing_detail.html'
-    context_object_name = 'mailing'
+    template_name = "sending_messages/mailing_detail.html"
+    context_object_name = "mailing"
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -148,11 +137,7 @@ class MailingDetailView(OwnerOrManagerMixin, MenuActiveMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['attempts'] = (
-            self.object.attempts
-            .select_related('recipient')
-            .order_by('-created_at')
-        )
+        context["attempts"] = self.object.attempts.select_related("recipient").order_by("-created_at")
         return context
 
 
@@ -160,10 +145,11 @@ class MailingCreateView(OwnerOrManagerMixin, MenuActiveMixin, CreateView):
     """
     Создание рассылки (Mailing) с фильтрацией Получателей (Recipients) и Сообщений (Messages)
     """
+
     model = Mailing
     form_class = MailingForm
-    template_name = 'sending_messages/form_mailing.html'
-    success_url = reverse_lazy('sending_messages:mailings_list')
+    template_name = "sending_messages/form_mailing.html"
+    success_url = reverse_lazy("sending_messages:mailings_list")
 
     def get_form(self, form_class=None):
         """
@@ -174,9 +160,9 @@ class MailingCreateView(OwnerOrManagerMixin, MenuActiveMixin, CreateView):
 
         # Для обычного пользователя фильтруем получателей
         if not user.is_staff and not user.is_superuser:
-            form.fields['recipients'].queryset = Recipient.objects.filter(owner=user)
+            form.fields["recipients"].queryset = Recipient.objects.filter(owner=user)
             # Фильтруем сообщения
-            form.fields['message'].queryset = Message.objects.filter(owner=user)
+            form.fields["message"].queryset = Message.objects.filter(owner=user)
 
         return form
 
@@ -199,7 +185,7 @@ class MailingCreateView(OwnerOrManagerMixin, MenuActiveMixin, CreateView):
             if form.instance.message.owner != user:
                 # Если сообщение чужое, сбрасываем выбор (можно также вызвать ошибку)
                 form.instance.message = None
-                form.instance.save(update_fields=['message'])
+                form.instance.save(update_fields=["message"])
 
         # Назначаем владельца новым Recipient
         for recipient in form.instance.recipients.all():
@@ -219,29 +205,22 @@ class MailingCreateView(OwnerOrManagerMixin, MenuActiveMixin, CreateView):
 class MailingUpdateView(OwnerOrManagerMixin, MenuActiveMixin, UpdateView):
     model = Mailing
     form_class = MailingForm
-    template_name = 'sending_messages/form_mailing.html'
-    success_url = reverse_lazy('sending_messages:mailings_list')
-
-    def get_queryset(self):
-        return super().get_queryset().filter(owner=self.request.user)
+    template_name = "sending_messages/form_mailing.html"
+    success_url = reverse_lazy("sending_messages:mailings_list")
 
 
 class MailingDeleteView(OwnerOrManagerMixin, MenuActiveMixin, DeleteView):
     model = Mailing
-    template_name = 'sending_messages/mailing_confirm_delete.html'
-    success_url = reverse_lazy('sending_messages:mailings_list')
-
-    def get_queryset(self):
-        return super().get_queryset().filter(owner=self.request.user)
+    template_name = "sending_messages/mailing_confirm_delete.html"
+    success_url = reverse_lazy("sending_messages:mailings_list")
 
 
-#################
-### Сообщения ###
-#################
+#                   Сообщения
+#################################################
 class MessageListView(OwnerOrManagerMixin, MenuActiveMixin, ListView):
     model = Message
-    template_name = 'sending_messages/messages_list.html'
-    context_object_name = 'messages'
+    template_name = "sending_messages/messages_list.html"
+    context_object_name = "messages"
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -253,8 +232,8 @@ class MessageListView(OwnerOrManagerMixin, MenuActiveMixin, ListView):
 
 class MessageDetailView(OwnerOrManagerMixin, MenuActiveMixin, DetailView):
     model = Message
-    template_name = 'sending_messages/message_detail.html'
-    context_object_name = 'message'
+    template_name = "sending_messages/message_detail.html"
+    context_object_name = "message"
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -267,8 +246,8 @@ class MessageDetailView(OwnerOrManagerMixin, MenuActiveMixin, DetailView):
 class MessageCreateView(OwnerOrManagerMixin, MenuActiveMixin, CreateView):
     model = Message
     form_class = MessageForm
-    template_name = 'sending_messages/form_message.html'
-    success_url = reverse_lazy('sending_messages:messages_list')
+    template_name = "sending_messages/form_message.html"
+    success_url = reverse_lazy("sending_messages:messages_list")
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -278,29 +257,22 @@ class MessageCreateView(OwnerOrManagerMixin, MenuActiveMixin, CreateView):
 class MessageUpdateView(OwnerOrManagerMixin, MenuActiveMixin, UpdateView):
     model = Message
     form_class = MessageForm
-    template_name = 'sending_messages/form_message.html'
-    success_url = reverse_lazy('sending_messages:messages_list')
-
-    def get_queryset(self):
-        return super().get_queryset().filter(owner=self.request.user)
+    template_name = "sending_messages/form_message.html"
+    success_url = reverse_lazy("sending_messages:messages_list")
 
 
 class MessageDeleteView(OwnerOrManagerMixin, MenuActiveMixin, DeleteView):
     model = Message
-    template_name = 'sending_messages/message_confirm_delete.html'
-    success_url = reverse_lazy('sending_messages:messages_list')
-
-    def get_queryset(self):
-        return super().get_queryset().filter(owner=self.request.user)
+    template_name = "sending_messages/message_confirm_delete.html"
+    success_url = reverse_lazy("sending_messages:messages_list")
 
 
-#####################
-### Иные действия ###
-#####################
+#                  Иные действия
+#################################################
 class MailingSendView(View):
     # noinspection PyUnusedLocal
     @staticmethod
     def post(request, pk, *args, **kwargs):
         mailing = get_object_or_404(Mailing, pk=pk)
         send_mailing(mailing)
-        return redirect('sending_messages:mailings_list')
+        return redirect("sending_messages:mailings_list")
