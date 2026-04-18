@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Форма -->
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="row g-0">
+        <form method="post" enctype="multipart/form-data" class="p-4">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Сохранить сообщение</button>
+            <!--suppress HtmlUnknownTarget -->
+            <a class="" href="{% if object %}{% url 'sending_messages:message_detail' object.pk %}{% else %}{% url 'sending_messages:messages_list' %}{% endif %}">
+                Назад
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}
