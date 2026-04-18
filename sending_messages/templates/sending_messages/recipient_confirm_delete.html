@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Форма -->
+<!--suppress ALL -->
+<form method="post">
+    {% csrf_token %}
+
+    <h4 class="text-center">Удалить {{ object.email }}?</h4>
+
+    <div class="row">
+        <!--Кнопки-->
+        <div>
+            <button type="submit">Удалить получателя</button>
+            <a href="{% url 'sending_messages:recipient_detail' object.pk %}">Отмена</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

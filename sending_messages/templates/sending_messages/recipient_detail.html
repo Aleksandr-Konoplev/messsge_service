@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!--suppress ALL -->
+<h2>Получатель рассылки</h2>
+<p>Электронная почта: {{ recipient.email }}</p>
+<p>Полное имя: {{ recipient.full_name }}</p>
+<p>Комментарий: {{ recipient.comment }}</p>
+<a href="{% url 'sending_messages:recipient_update' recipient.pk %}">Редактировать получателя рассылки</a>
+<a href="{% url 'sending_messages:recipient_delete' recipient.pk %}">Удалить получателя рассылки</a>
+
+{% endblock %}

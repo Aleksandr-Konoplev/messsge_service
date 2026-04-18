@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load tz %}
+
+<!--suppress ALL -->
+<p>Количество всех рассылок: {{ mailings_total }}</p>
+<p>Количество активных рассылок: {{ mailings_running }}</p>
+<p>Количество уникальных получателей: {{ recipients_total }}</p>
+
+{% endblock %}
